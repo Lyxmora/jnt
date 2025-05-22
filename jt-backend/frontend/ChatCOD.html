@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Generator Pesan J&T</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            margin: auto;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h2 {
+            color: #d00000;
+        }
+        label {
+            margin-top: 10px;
+            display: block;
+        }
+        input, select {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+        button {
+            padding: 10px 20px;
+            margin-right: 10px;
+            background-color: #d00000;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .output {
+            background-color: #fff3cd;
+            padding: 15px;
+            white-space: pre-line;
+            border-left: 5px solid #ffeeba;
+            margin-top: 15px;
+        }
+        .wa-number {
+            margin-top: 10px;
+            font-weight: bold;
+            color: #333;
+        }
+        .scheduled-list {
+            margin-top: 20px;
+            border-top: 1px solid #ddd;
+            padding-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Generator Pesan J&T</h2>
+
+        <label>Nama Kantor J&T:</label>
+        <input type="text" id="kantor" placeholder="Contoh: Kayutangi">
+
+        <label>Nama:</label>
+        <input type="text" id="nama">
+
+        <label>Resi:</label>
+        <input type="text" id="resi">
+
+        <label>Kode Paket:</label>
+        <input type="text" id="kode">
+
+        <label>Nomor WhatsApp Customer:</label>
+        <input type="text" id="wa" placeholder="Contoh: 6281234567890 (tanpa +)">
+
+        <label>Catatan Tambahan:</label>
+        <input type="text" id="catatan" placeholder="(Opsional, tidak masuk ke pesan)">
+
+        <label>Jadwal Pengiriman:</label>
+        <select id="scheduleType">
+            <option value="now">Kirim Sekarang</option>
+            <option value="later">Jadwalkan Nanti</option>
+        </select>
+
+        <div id="scheduleOptions" style="display:none;">
+            <label>Tanggal & Waktu:</label>
+            <input type="datetime-local" id="scheduledTime">
+        </div>
+
+        <button onclick="generateMessage()">Generate Pesan</button>
+        <button onclick="scheduleMessage()" id="scheduleBtn" style="display:none;">Jadwalkan Pesan</button>
+        <button onclick="sendWhatsApp()" id="sendBtn">Kirim via WhatsApp</button>
+        <button onclick="copyMessage()">Salin Pesan</button>
+
+        <div class="output" id="output"></div>
+        <div class="wa-number" id="waDisplay"></div>
+
+        <div class="scheduled-list">
+            <h3>Pesan Terjadwal:</h3>
+            <ul id="scheduledMessages"></ul>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('scheduleType').addEventListener('change', function() {
+            const options = document.getElementById('scheduleOptions');
+            const scheduleBtn = document.getElementById('scheduleBtn');
+            const sendBtn = document.getElementById('sendBtn');
+
+            if (this.value === 'later') {
+                options.style.display = 'block';
+                scheduleBtn.style.display = 'inline-block';
+                sendBtn.style.display = 'none';
+            } else {
+                options.style.display = 'none';
+                scheduleBtn.style.display = 'none';
+                sendBtn.style.display = 'inline-block';
+            }
+        });
+
+        let scheduledMessages = [];
+
+        function generateMessage() {
+            const nama = document.getElementById('nama').value;
+            const resi = document.getElementById('resi').value;
+            const kode = document.getElementById('kode').value;
+            const wa = document.getElementById('wa').value;
+            const kantor = document.getElementById('kantor').value || "[Nama Kantor]";
+
+            const template = `Permisi ini dari admin J&T ${kantor} memberitahukan paket COD anda telah sampai di kantor
+Nama : ${nama}
+Resi  : ${resi}
+Kode Paket : ${kode}
+
+udah bisa diambil ya kak, kantor buka jam 08.00-21.00 WITA
+Terima kasih 🙏`;
+
+            document.getElementById('waDisplay').textContent = `Nomor WhatsApp: ${wa}`;
+            document.getElementById('output').textContent = template;
+            return template;
+        }
+
+        function copyMessage() {
+            const output = document.getElementById('output');
+            if (!output.textContent) {
+                alert("Silakan buat pesan terlebih dahulu.");
+                return;
+            }
+            navigator.clipboard.writeText(output.textContent);
+            alert('Pesan telah disalin!');
+        }
+
+        function sendWhatsApp() {
+            const message = generateMessage();
+            const waNumber = document.getElementById('wa').value;
+            if (!waNumber || !message) {
+                alert("Harap isi nomor WhatsApp dan buat pesan terlebih dahulu.");
+                return;
+            }
+            const url = `https://wa.me/${waNumber}?text=${encodeURIComponent(message)}`;
+            window.open(url, '_blank');
+        }
+
+        function scheduleMessage() {
+            const message = generateMessage();
+            const waNumber = document.getElementById('wa').value;
+            const scheduledTime = new Date(document.getElementById('scheduledTime').value);
+
+            if (!waNumber || !scheduledTime) {
+                alert('Harap isi nomor WhatsApp dan waktu pengiriman!');
+                return;
+            }
+
+            const now = new Date();
+            if (scheduledTime < now) {
+                alert('Waktu pengiriman harus lebih besar dari waktu sekarang!');
+                return;
+            }
+
+            const scheduledItem = {
+                message,
+                waNumber,
+                time: scheduledTime.getTime(),
+                formattedTime: scheduledTime.toLocaleString()
+            };
+
+            scheduledMessages.push(scheduledItem);
+            updateScheduledList();
+            startScheduleCheck();
+            alert(`Pesan berhasil dijadwalkan untuk ${scheduledItem.formattedTime}`);
+        }
+
+        function updateScheduledList() {
+            const list = document.getElementById('scheduledMessages');
+            list.innerHTML = '';
+
+            scheduledMessages.forEach((item, index) => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <strong>${item.formattedTime}</strong><br>
+                    ${item.message.substring(0, 50)}...<br>
+                    <button onclick="sendNow(${index})">Kirim Sekarang</button>
+                    <button onclick="cancelSchedule(${index})">Batalkan</button>
+                `;
+                list.appendChild(li);
+            });
+        }
+
+        function sendNow(index) {
+            const item = scheduledMessages[index];
+            window.open(`https://wa.me/${item.waNumber}?text=${encodeURIComponent(item.message)}`, '_blank');
+        }
+
+        function cancelSchedule(index) {
+            scheduledMessages.splice(index, 1);
+            updateScheduledList();
+        }
+
+        function startScheduleCheck() {
+            setInterval(() => {
+                const now = new Date().getTime();
+                scheduledMessages.forEach((item, index) => {
+                    if (now >= item.time) {
+                        window.open(`https://wa.me/${item.waNumber}?text=${encodeURIComponent(item.message)}`, '_blank');
+                        scheduledMessages.splice(index, 1);
+                        updateScheduledList();
+                    }
+                });
+            }, 30000);
+        }
+    </script>
+</body>
+</html>

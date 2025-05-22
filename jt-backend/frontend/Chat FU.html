@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Follow Up J&T</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            margin: auto;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h2 {
+            color: #d00000;
+        }
+        label {
+            margin-top: 10px;
+            display: block;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+        button {
+            padding: 10px 20px;
+            margin-right: 10px;
+            background-color: #d00000;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .output {
+            background-color: #fff3cd;
+            padding: 15px;
+            white-space: pre-line;
+            border-left: 5px solid #ffeeba;
+            margin-top: 15px;
+        }
+        .wa-number {
+            margin-top: 10px;
+            font-weight: bold;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Form Follow-Up J&T</h2>
+
+        <label>Nama Kantor J&T:</label>
+        <input type="text" id="kantor" placeholder="Contoh: Kayutangi">
+
+        <label>Nama:</label>
+        <input type="text" id="nama">
+
+        <label>Nama Barang:</label>
+        <input type="text" id="barang">
+
+        <label>No. Resi:</label>
+        <input type="text" id="resi">
+
+        <label>Alamat yang tertera di Paket:</label>
+        <textarea id="alamat" rows="3"></textarea>
+
+        <label>Pembayaran:</label>
+        <select id="pembayaran">
+            <option value="COD">COD</option>
+            <option value="DFOD">DFOD</option>
+            <option value="TUNAI">TUNAI</option>
+        </select>
+
+        <label>Nomor WhatsApp Customer:</label>
+        <input type="text" id="wa" placeholder="Contoh: 6281234567890 (tanpa +)">
+
+        <button onclick="buatPesan()">Buat Pesan</button>
+        <button onclick="copyText()">Salin Pesan</button>
+        <button onclick="kirimWA()">Kirim via WhatsApp</button>
+
+        <div class="output" id="output"></div>
+        <div class="wa-number" id="waDisplay"></div>
+    </div>
+
+    <script>
+        function buatPesan() {
+            const nama = document.getElementById("nama").value;
+            const barang = document.getElementById("barang").value;
+            const resi = document.getElementById("resi").value;
+            const alamat = document.getElementById("alamat").value;
+            const pembayaran = document.getElementById("pembayaran").value;
+            const wa = document.getElementById("wa").value;
+            const kantor = document.getElementById("kantor").value || "[Nama Kantor]";
+
+            const pesan = `Permisi ini dari admin J&T ${kantor} memberitahukan bahwa paket anda telah sampai di kantor.
+
+Nama: ${nama}
+Nama Barang: ${barang}
+Resi: ${resi}
+Alamat yang tertera di Paket: ${alamat}
+Pembayaran: ${pembayaran}
+
+Apakah kami bisa minta tolong kirimkan *Share Location* rumah atau kos kakaknya?
+Karena kami belum mengetahui alamat pasti rumah atau kos kakaknya, maka paket kakak akan sementara disimpan di gudang kantor J&T ${kantor} yaa kak.
+
+Terima kasih.`;
+
+            document.getElementById("output").innerText = pesan;
+            document.getElementById("waDisplay").innerText = `Nomor WhatsApp: ${wa}`;
+        }
+
+        function copyText() {
+            const text = document.getElementById("output").innerText;
+            if (!text) {
+                alert("Silakan buat pesan terlebih dahulu.");
+                return;
+            }
+            navigator.clipboard.writeText(text).then(() => {
+                alert("Pesan disalin ke clipboard!");
+            });
+        }
+
+        function kirimWA() {
+            const wa = document.getElementById("wa").value;
+            const pesan = document.getElementById("output").innerText;
+
+            if (!wa || !pesan) {
+                alert("Harap isi nomor WhatsApp dan buat pesan terlebih dahulu.");
+                return;
+            }
+
+            const url = `https://wa.me/${wa}?text=${encodeURIComponent(pesan)}`;
+            window.open(url, "_blank");
+        }
+    </script>
+</body>
+</html>

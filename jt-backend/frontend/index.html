@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard J&T</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            width: 95%;
+            margin: auto;
+            overflow: hidden;
+        }
+        header {
+            background: #d00000;
+            color: white;
+            padding: 20px 0;
+            margin-bottom: 20px;
+        }
+        header h1 {
+            margin: 0;
+            padding: 0 20px;
+        }
+        nav {
+            display: flex;
+            justify-content: space-between;
+            background: #333;
+            color: white;
+            padding: 10px 20px;
+        }
+        nav a {
+            color: white;
+            text-decoration: none;
+            padding: 5px 10px;
+        }
+        nav a:hover {
+            background: #555;
+        }
+        .logout {
+            background: #d00000;
+        }
+        .card {
+            background: white;
+            margin: 10px 0;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .tab {
+            overflow: hidden;
+            border: 1px solid #ccc;
+            background-color: #f1f1f1;
+        }
+        .tab button {
+            background-color: inherit;
+            float: left;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 14px 16px;
+            transition: 0.3s;
+        }
+        .tab button:hover {
+            background-color: #ddd;
+        }
+        .tab button.active {
+            background-color: #d00000;
+            color: white;
+        }
+        .tabcontent {
+            display: none;
+            padding: 6px 12px;
+            border: 1px solid #ccc;
+            border-top: none;
+        }
+        .search-container {
+            margin: 20px 0;
+        }
+        .search-container input {
+            padding: 10px;
+            width: 300px;
+        }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .pagination a {
+            color: black;
+            padding: 8px 16px;
+            text-decoration: none;
+            border: 1px solid #ddd;
+        }
+        .pagination a.active {
+            background-color: #d00000;
+            color: white;
+            border: 1px solid #d00000;
+        }
+        .pagination a:hover:not(.active) {
+            background-color: #ddd;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Admin Dashboard J&T</h1>
+        </div>
+    </header>
+    
+    <nav>
+        <div>
+            <a href="#" class="active">Dashboard</a>
+            <a href="#" id="userManagementLink" style="display:none;">User Management</a>
+        </div>
+        <div>
+            <a href="#" class="logout" id="logoutBtn">Logout</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="tab">
+            <button class="tablinks active" onclick="openTab(event, 'cod')">Data COD</button>
+            <button class="tablinks" onclick="openTab(event, 'fu')">Data Follow Up</button>
+        </div>
+
+        <!-- COD Tab -->
+        <div id="cod" class="tabcontent" style="display: block;">
+            <div class="search-container">
+                <input type="text" id="searchCOD" placeholder="Cari berdasarkan nama, resi, atau kode..." onkeyup="searchCOD()">
+            </div>
+            <div class="card">
+                <table id="codTable">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Tanggal</th>
+                            <th>Nama</th>
+                            <th>Resi</th>
+                            <th>Kode Paket</th>
+                            <th>No. WhatsApp</th>
+                            <th>Kantor</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="codData">
+                        <!-- Data akan diisi oleh JavaScript -->
+                    </tbody>
+                </table>
+                <div class="pagination" id="codPagination">
+                    <!-- Pagination akan diisi oleh JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- FU Tab -->
+        <div id="fu" class="tabcontent">
+            <div class="search-container">
+                <input type="text" id="searchFU" placeholder="Cari berdasarkan nama, resi, atau barang..." onkeyup="searchFU()">
+            </div>
+            <div class="card">
+                <table id="fuTable">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Tanggal</th>
+                            <th>Nama</th>
+                            <th>Barang</th>
+                            <th>Resi</th>
+                            <th>Alamat</th>
+                            <th>Pembayaran</th>
+                            <th>No. WhatsApp</th>
+                            <th>Kantor</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="fuData">
+                        <!-- Data akan diisi oleh JavaScript -->
+                    </tbody>
+                </table>
+                <div class="pagination" id="fuPagination">
+                    <!-- Pagination akan diisi oleh JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- User Management Tab (Hanya untuk Superadmin) -->
+        <div id="userManagement" class="tabcontent">
+            <div class="card">
+                <h2>User Management</h2>
+                <button id="addUserBtn">Tambah User</button>
+                <table id="userTable">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Username</th>
+                            <th>Role</th>
+                            <th>Tanggal Dibuat</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="userData">
+                        <!-- Data akan diisi oleh JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal untuk Add/Edit User -->
+    <div id="userModal" class="modal" style="display:none; position:fixed; z-index:1; left:0; top:0; width:100%; height:100%; background-color:rgba(0,0,0,0.4);">
+        <div class="modal-content" style="background-color:#fefefe; margin:15% auto; padding:20px; border:1px solid #888; width:50%;">
+            <span class="close" style="color:#aaa; float:right; font-size:28px; font-weight:bold; cursor:pointer;">&times;</span>
+            <h2 id="modalTitle">Tambah User Baru</h2>
+            <form id="userForm">
+                <input type="hidden" id="userId">
+                <div>
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" required>
+                </div>
+                <div>
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" required>
+                </div>
+                <div>
+                    <label for="role">Role:</label>
+                    <select id="role" required>
+                        <option value="admin">Admin</option>
+                        <option value="superadmin">Superadmin</option>
+                    </select>
+                </div>
+                <button type="submit">Simpan</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Variabel global
+        let currentUserRole = '';
+        let codData = [];
+        let fuData = [];
+        let usersData = [];
+        let currentPageCOD = 1;
+        let currentPageFU = 1;
+        const itemsPerPage = 10;
+
+        // Check authentication and load data on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // Decode token to get user role
+            try {
+                const payload = JSON.parse(atob(token.split('.')[1]));
+                currentUserRole = payload.role;
+                if (currentUserRole === 'superadmin') {
+                    document.getElementById('userManagementLink').style.display = 'inline-block';
+                }
+            } catch (e) {
+                console.error('Error decoding token:', e);
+            }
+
+            // Load initial data
+            loadCODData();
+            loadFUData();
+            if (currentUserRole === 'superadmin') {
+                loadUsers();
+            }
+
+            // Set up event listeners
+            document.getElementById('logoutBtn').addEventListener('click', logout);
+            document.getElementById('addUserBtn')?.addEventListener('click', showAddUserModal);
+            document.querySelector('.close')?.addEventListener('click', closeModal);
+            document.getElementById('userForm')?.addEventListener('submit', handleUserFormSubmit);
+        });
+
+        // Tab functionality
+        function openTab(evt, tabName) {
+            const tabcontent = document.getElementsByClassName("tabcontent");
+            for (let i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
+
+            const tablinks = document.getElementsByClassName("tablinks");
+            for (let i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+            }
+
+            document.getElementById(tabName).style.display = "block";
+            evt.currentTarget.className += " active";
+        }
+
+        // Load COD Data
+        async function loadCODData() {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch('/chat-cod', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (!response.ok) throw new Error('Gagal memuat data COD');
+                
+                codData = await response.json();
+                renderCODTable();
+            } catch (error) {
+                console.error('Error:', error);
+                alert(error.message);
+            }
+        }
+
+        // Render COD Table
+        function renderCODTable(page = 1) {
+            currentPageCOD = page;
+            const startIndex = (page - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const paginatedData = codData.slice(startIndex, endIndex);
+            
+            const tableBody = document.getElementById('codData');
+            tableBody.innerHTML = '';
+            
+            paginatedData.forEach((item, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${startIndex + index + 1}</td>
+                    <td>${new Date(item.createdAt).toLocaleString()}</td>
+                    <td>${item.nama || '-'}</td>
+                    <td>${item.resi || '-'}</td>
+                    <td>${item.kode || '-'}</td>
+                    <td>${item.wa || '-'}</td>
+                    <td>${item.kantor || '-'}</td>
+                    <td>
+                        <button onclick="deleteCOD('${item._id}')">Hapus</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+            
+            // Render pagination
+            renderPagination('codPagination', codData.length, currentPageCOD, 'COD');
+        }
+
+        // Load FU Data
+        async function loadFUData() {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch('/chat-fu', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (!response.ok) throw new Error('Gagal memuat data Follow Up');
+                
+                fuData = await response.json();
+                renderFUTable();
+            } catch (error) {
+                console.error('Error:', error);
+                alert(error.message);
+            }
+        }
+
+        // Render FU Table
+        function renderFUTable(page = 1) {
+            currentPageFU = page;
+            const startIndex = (page - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const paginatedData = fuData.slice(startIndex, endIndex);
+            
+            const tableBody = document.getElementById('fuData');
+            tableBody.innerHTML = '';
+            
+            paginatedData.forEach((item, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${startIndex + index + 1}</td>
+                    <td>${new Date(item.createdAt).toLocaleString()}</td>
+                    <td>${item.nama || '-'}</td>
+                    <td>${item.barang || '-'}</td>
+                    <td>${item.resi || '-'}</td>
+                    <td>${item.alamat ? item.alamat.substring(0, 30) + (item.alamat.length > 30 ? '...' : '') : '-'}</td>
+                    <td>${item.pembayaran || '-'}</td>
+                    <td>${item.wa || '-'}</td>
+                    <td>${item.kantor || '-'}</td>
+                    <td>
+                        <button onclick="deleteFU('${item._id}')">Hapus</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+            
+            // Render pagination
+            renderPagination('fuPagination', fuData.length, currentPageFU, 'FU');
+        }
+
+        // Load Users Data (Superadmin only)
+        async function loadUsers() {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch('/users', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (!response.ok) throw new Error('Gagal memuat data user');
+                
+                usersData = await response.json();
+                renderUserTable();
+            } catch (error) {
+                console.error('Error:', error);
+                alert(error.message);
+            }
+        }
+
+        // Render User Table
+        function renderUserTable() {
+            const tableBody = document.getElementById('userData');
+            tableBody.innerHTML = '';
+            
+            usersData.forEach((user, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${user.username}</td>
+                    <td>${user.role}</td>
+                    <td>${new Date(user.createdAt).toLocaleString()}</td>
+                    <td>
+                        <button onclick="editUser('${user._id}')">Edit</button>
+                        <button onclick="deleteUser('${user._id}')">Hapus</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Delete COD Data
+        async function deleteCOD(id) {
+            if (!confirm('Apakah Anda yakin ingin menghapus data ini?')) return;
+            
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`/chat-cod/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (!response.ok) throw new Error('Gagal menghapus data COD');
+                
+                alert('Data COD berhasil dihapus');
+                loadCODData();
+            } catch (error) {
+                console.error('Error:', error);
+                alert(error.message);
+            }
+        }
+
+        // Delete FU Data
+        async function deleteFU(id) {
+            if (!confirm('Apakah Anda yakin ingin menghapus data ini?')) return;
+            
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`/chat-fu/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (!response.ok) throw new Error('Gagal menghapus data Follow Up');
+                
+                alert('Data Follow Up berhasil dihapus');
+                loadFUData();
+            } catch (error) {
+                console.error('Error:', error);
+                alert(error.message);
+            }
+        }
+
+        // Delete User (Superadmin only)
+        async function deleteUser(id) {
+            if (!confirm('Apakah Anda yakin ingin menghapus user ini?')) return;
+            
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`/users/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (!response.ok) throw new Error('Gagal menghapus user');
+                
+                alert('User berhasil dihapus');
+                loadUsers();
+            } catch (error) {
+                console.error('Error:', error);
+                alert(error.message);
+            }
+        }
+
+        // User Management Functions
+        function showAddUserModal() {
+            document.getElementById('modalTitle').textContent = 'Tambah User Baru';
+            document.getElementById('userId').value = '';
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+            document.getElementById('role').value = 'admin';
+            document.getElementById('userModal').style.display = 'block';
+        }
+
+        function editUser(id) {
+            const user = usersData.find(u => u._id === id);
+            if (!user) return;
+            
+            document.getElementById('modalTitle').textContent = 'Edit User';
+            document.getElementById('userId').value = user._id;
+            document.getElementById('username').value = user.username;
+            document.getElementById('password').value = '';
+            document.getElementById('role').value = user.role;
+            document.getElementById('userModal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('userModal').style.display = 'none';
+        }
+
+        async function handleUserFormSubmit(e) {
+            e.preventDefault();
+            
+            const id = document.getElementById('userId').value;
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const role = document.getElementById('role').value;
+            
+            try {
+                const token = localStorage.getItem('token');
+                let response;
+                
+                if (id) {
+                    // Update existing user
+                    response = await fetch(`/users/${id}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ username, password, role })
+                    });
+                } else {
+                    // Create new user
+                    response = await fetch('/users', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ username, password, role })
+                    });
+                }
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Gagal menyimpan user');
+                }
+                
+                alert('User berhasil disimpan');
+                closeModal();
+                loadUsers();
+            } catch (error) {
+                console.error('Error:', error);
+                alert(error.message);
+            }
+        }
+
+        // Search Functions
+        function searchCOD() {
+            const searchTerm = document.getElementById('searchCOD').value.toLowerCase();
+            const filteredData = codData.filter(item => 
+                (item.nama && item.nama.toLowerCase().includes(searchTerm)) ||
+                (item.resi && item.resi.toLowerCase().includes(searchTerm)) ||
+                (item.kode && item.kode.toLowerCase().includes(searchTerm))
+            );
+            
+            // Temporary render filtered data
+            const tableBody = document.getElementById('codData');
+            tableBody.innerHTML = '';
+            
+            filteredData.forEach((item, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${new Date(item.createdAt).toLocaleString()}</td>
+                    <td>${item.nama || '-'}</td>
+                    <td>${item.resi || '-'}</td>
+                    <td>${item.kode || '-'}</td>
+                    <td>${item.wa || '-'}</td>
+                    <td>${item.kantor || '-'}</td>
+                    <td>
+                        <button onclick="deleteCOD('${item._id}')">Hapus</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        function searchFU() {
+            const searchTerm = document.getElementById('searchFU').value.toLowerCase();
+            const filteredData = fuData.filter(item => 
+                (item.nama && item.nama.toLowerCase().includes(searchTerm)) ||
+                (item.resi && item.resi.toLowerCase().includes(searchTerm)) ||
+                (item.barang && item.barang.toLowerCase().includes(searchTerm))
+            );
+            
+            // Temporary render filtered data
+            const tableBody = document.getElementById('fuData');
+            tableBody.innerHTML = '';
+            
+            filteredData.forEach((item, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${new Date(item.createdAt).toLocaleString()}</td>
+                    <td>${item.nama || '-'}</td>
+                    <td>${item.barang || '-'}</td>
+                    <td>${item.resi || '-'}</td>
+                    <td>${item.alamat ? item.alamat.substring(0, 30) + (item.alamat.length > 30 ? '...' : '') : '-'}</td>
+                    <td>${item.pembayaran || '-'}</td>
+                    <td>${item.wa || '-'}</td>
+                    <td>${item.kantor || '-'}</td>
+                    <td>
+                        <button onclick="deleteFU('${item._id}')">Hapus</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Pagination Functions
+        function renderPagination(elementId, totalItems, currentPage, dataType) {
+            const totalPages = Math.ceil(totalItems / itemsPerPage);
+            const paginationDiv = document.getElementById(elementId);
+            
+            if (totalPages <= 1) {
+                paginationDiv.innerHTML = '';
+                return;
+            }
+            
+            let html = '';
+            
+            // Previous button
+            if (currentPage > 1) {
+                html += `<a href="#" onclick="changePage${dataType}(${currentPage - 1})">&laquo;</a>`;
+            } else {
+                html += `<a class="disabled">&laquo;</a>`;
+            }
+            
+            // Page numbers
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === currentPage) {
+                    html += `<a href="#" class="active" onclick="return false;">${i}</a>`;
+                } else {
+                    html += `<a href="#" onclick="changePage${dataType}(${i})">${i}</a>`;
+                }
+            }
+            
+            // Next button
+            if (currentPage < totalPages) {
+                html += `<a href="#" onclick="changePage${dataType}(${currentPage + 1})">&raquo;</a>`;
+            } else {
+                html += `<a class="disabled">&raquo;</a>`;
+            }
+            
+            paginationDiv.innerHTML = html;
+        }
+
+        function changePageCOD(page) {
+            renderCODTable(page);
+        }
+
+        function changePageFU(page) {
+            renderFUTable(page);
+        }
+
+        // Logout
+        function logout() {
+            localStorage.removeItem('token');
+            window.location.href = 'login.html';
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('userModal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
